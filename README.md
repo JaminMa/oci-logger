@@ -74,6 +74,11 @@ npm run build
 npm start
 ```
 
+**Docker**:
+```bash
+docker compose up --build -d
+```
+
 ## API Reference
 
 ### `GET /health`
