@@ -16,12 +16,19 @@ async function main() {
   app.use(express.json());
 
   // CORS Configuration
-  const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['*'];
+  const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : ['*'];
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf('*') !== -1 || allowedOrigins.indexOf(origin) !== -1) {
+      
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (allowed === '*') return true;
+        if (allowed.startsWith('*.') && origin.endsWith(allowed.slice(1))) return true;
+        return allowed === origin;
+      });
+
+      if (isAllowed) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
